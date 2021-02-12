@@ -2,6 +2,7 @@ module.exports = {
   env: {
     es2021: true,
     node: true,
+    'jest/globals': true,
   },
   extends: [
     'eslint:reccomend',
@@ -22,7 +23,7 @@ module.exports = {
     sourceType: 'module',
     tsconfigRootDir: __dirname,
   },
-  plugins: ['@typescript-eslint', 'import'],
+  plugins: ['@typescript-eslint', 'import', 'jest'],
   root: true,
   rules: {
     'no-use-before-define': 'off',
