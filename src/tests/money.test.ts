@@ -8,4 +8,9 @@ describe('Dollar', () => {
     product = five.times(3);
     expect(product.amount).toEqual(15);
   });
+
+  test('testEquality', () => {
+    expect(new Dollar(5).equals(new Dollar(5))).toBe(true);
+    expect(new Dollar(5).equals(new Dollar(6))).toBe(false);
+  });
 });
