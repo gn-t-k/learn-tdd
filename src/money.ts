@@ -1,4 +1,12 @@
-export class Money {
+class Expression {}
+
+export class Bank {
+  reduce(source: Expression, to: string): Money {
+    return Money.dollar(10);
+  }
+}
+
+export class Money implements Expression {
   protected amount: number;
   protected currency: string;
 
