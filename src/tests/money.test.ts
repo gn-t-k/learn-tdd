@@ -53,4 +53,8 @@ describe('MoneyTest', () => {
     const result: Money = bank.reduce(Money.franc(2), 'USD');
     expect(Money.dollar(1)).toEqual(result);
   });
+
+  test('testIdentityRate', () => {
+    expect(new Bank().rate('USD', 'USD')).toEqual(1);
+  });
 });

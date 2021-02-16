@@ -12,20 +12,28 @@ export class Sum implements Expression {
   }
 
   public reduce(bank: Bank, to: string): Money {
-    const amount: number = this.augend.amount + this.addend.amount;
+    const amount: number = this.augend.getAmount() + this.addend.getAmount();
     return new Money(amount, to);
   }
 }
 
 export class Bank {
+  private rates = new Map<string, number>();
+
   reduce(source: Expression, to: string): Money {
     return source.reduce(this, to);
   }
 
-  addRate(from: string, to: string, rate: number) {}
+  addRate(from: string, to: string, rate: number) {
+    const key = new RateKey(from, to).value;
+    this.rates.set(key, rate);
+  }
 
   rate(from: string, to: string): number {
-    return from === 'CHF' && to === 'USD' ? 2 : 1;
+    if (from === to) return 1;
+    const key = new RateKey(from, to).value;
+    const rate = this.rates.get(key) as number;
+    return rate;
   }
 }
 
@@ -55,6 +63,10 @@ export class Money implements Expression {
     return this.currency;
   }
 
+  getAmount(): number {
+    return this.amount;
+  }
+
   public equals(money: Money): boolean {
     return this.amount === money.amount && money.currency === this.currency;
   }
@@ -69,5 +81,35 @@ export class Money implements Expression {
 
   static franc(amount: number): Money {
     return new Money(amount, 'CHF');
+  }
+}
+
+export class Pair {
+  private from: string;
+  private to: string;
+
+  constructor(from: string, to: string) {
+    this.from = from;
+    this.to = to;
+  }
+
+  public equals(pair: Pair) {
+    return this.from === pair.from && this.to === pair.to;
+  }
+
+  public hashCode() {
+    return 0;
+  }
+}
+
+class RateKey {
+  constructor(private from: string, private to: string) {}
+
+  get value(): string {
+    return `${this.from}:${this.to}`;
+  }
+
+  equals(key: RateKey): boolean {
+    return this.from === key.from && this.to === key.to;
   }
 }
