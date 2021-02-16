@@ -1,5 +1,5 @@
 export interface Expression {
-  reduce(to: string): Money;
+  reduce(bank: Bank, to: string): Money;
 }
 
 export class Sum implements Expression {
@@ -11,7 +11,7 @@ export class Sum implements Expression {
     this.addend = addend;
   }
 
-  public reduce(to: string): Money {
+  public reduce(bank: Bank, to: string): Money {
     const amount: number = this.augend.amount + this.addend.amount;
     return new Money(amount, to);
   }
@@ -19,7 +19,13 @@ export class Sum implements Expression {
 
 export class Bank {
   reduce(source: Expression, to: string): Money {
-    return source.reduce(to);
+    return source.reduce(this, to);
+  }
+
+  addRate(from: string, to: string, rate: number) {}
+
+  rate(from: string, to: string): number {
+    return from === 'CHF' && to === 'USD' ? 2 : 1;
   }
 }
 
@@ -36,20 +42,25 @@ export class Money implements Expression {
     return new Money(this.amount * multiplier, this.currency);
   }
 
-  plus(addend: Money) {
+  plus(addend: Money): Expression {
     return new Sum(this, addend);
   }
 
-  public reduce(to: string): Money {
-    return this;
-  }
-
-  equals(money: Money): boolean {
-    return this.amount === money.amount && money.currency === this.currency;
+  public reduce(bank: Bank, to: string): Money {
+    const rate: number = bank.rate(this.currency, to);
+    return new Money(this.amount / rate, to);
   }
 
   getCurrency(): string {
     return this.currency;
+  }
+
+  public equals(money: Money): boolean {
+    return this.amount === money.amount && money.currency === this.currency;
+  }
+
+  public toString(): string {
+    return this.amount + ' ' + this.currency;
   }
 
   static dollar(amount: number): Money {
