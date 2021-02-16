@@ -1,19 +1,26 @@
 export interface Expression {
+  plus(addend: Expression): Expression;
   reduce(bank: Bank, to: string): Money;
 }
 
 export class Sum implements Expression {
-  augend: Money;
-  addend: Money;
+  augend: Expression;
+  addend: Expression;
 
-  constructor(augend: Money, addend: Money) {
+  constructor(augend: Expression, addend: Expression) {
     this.augend = augend;
     this.addend = addend;
   }
 
   public reduce(bank: Bank, to: string): Money {
-    const amount: number = this.augend.getAmount() + this.addend.getAmount();
+    const amount: number =
+      this.augend.reduce(bank, to).getAmount() +
+      this.addend.reduce(bank, to).getAmount();
     return new Money(amount, to);
+  }
+
+  public plus(addend: Expression): Expression {
+    return null;
   }
 }
 
@@ -46,11 +53,11 @@ export class Money implements Expression {
     this.currency = currency;
   }
 
-  times(multiplier: number): Money {
+  times(multiplier: number): Expression {
     return new Money(this.amount * multiplier, this.currency);
   }
 
-  plus(addend: Money): Expression {
+  public plus(addend: Expression): Expression {
     return new Sum(this, addend);
   }
 
